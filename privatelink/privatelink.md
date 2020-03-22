@@ -26,7 +26,7 @@ Private Link (Private Endpoint 含む) と、Private Link サービスは、そ�
 
 ここでは、まず Private Endpoint について説明していきます。
 
-## Private Endpoint により Azure パブリックサービスに対してプライベート IP アドレスでアクセスさせることが可能になります
+## Private Endpoint とは
 
 従来、Azure パブリック サービス (PaaS サービス) はパブリック IP アドレスでのアクセスだけが可能でした。  
 これをお客様のネットワークに閉じたい場合、App Service でいう App Service Environment など、PaaS サービス自体を仮想ネットワーク上に構築するような機能が必要です。  
@@ -56,9 +56,9 @@ https://docs.microsoft.com/ja-jp/azure/private-link/create-private-endpoint-port
 
 
 ## DNS 構成について
-Private Endpoint を使用する際に混乱しやすいポイントとして、**DNSの設定方法** があります。  
+Private Endpoint を使用する際に混乱しやすいポイントとして、DNSの設定方法があります。  
 まず知っておいていただきたい点として、Private Endpoint は**プライベート IP アドレスを提供するサービスであり、Azure PaaS サービスのFQDN をプライベート IP に名前解決してくれる機能は持ちません。**  
-つまり、Private Endpoint 以外の何かしらの方法で、対象の FQDN をプライベート IP アドレスに変換させる必要があります。
+つまり、Private Endpoint 以外の何かしらの方法で、対象の FQDN をプライベート IP アドレスに変換させる仕組みが必要となります。
 
 この DNS の設定に際して、Private Endpoint 有効化時に Azure 側で追加される private link 用の DNS ゾーン (`privatelink.xxx.net`) が重要になります。  
 
@@ -93,7 +93,8 @@ Private DNS ゾーンとリンクされた仮想ネットワーク内のリソ�
 `example.com` の Private DNS ゾーンを参照させることが可能になります。
 
 ご留意点として、DNS サーバー (168.63.129.26) のご利用が必須になるため、**カスタム DNS を使用している場合と、オンプレミス側から名前解決する場合には、ご利用いただけません**  
-※ DNS サーバー (168.63.129.26) は Azure からのアクセスのみ許可されている IP アドレスになります。
+※ DNS サーバー (168.63.129.26) は Azure からのアクセスのみ許可されている IP アドレスになります。  
+※ カスタム DNS サーバーのフォワード先としてDNS サーバー (168.63.129.26) を指定する方法もございます。
 
 この機能を利用して、Private Endpoint 有効化時に利用可能なゾーン (`privatelink.xxx`) に対応する Private DNS ゾーンを作成し、
 そのゾーン内に、Private Endpoint (プライベート IP アドレス) に対応する A レコードを追加することで、
@@ -103,4 +104,22 @@ Private DNS ゾーンとリンクされた仮想ネットワーク内のリソ�
 
 <p><img src="./img/privatezone-integration.png" alt="private-endpoint" /></p> 
 
+上記のストレージアカウントの場合、下記のようなPrivate DNS ゾーンが自動で作成されます。
+
+<p><img src="./img/privatezone-example.png" alt="private-endpoint" /></p> 
+
 ### 3. 独自の DNS サーバーを使用する
+
+
+## Private Link サービスとは
+
+## プレビュー状況について
+
+## よくあるご質問
+### 1. サービスエンドポイントとプライベートエンドポイントの違いは？
+
+### 2. プライベート DNS ゾーンを設定したのに、仮想ネットワークピアリング先のリソースから名前解決できない
+
+### 3. Private Endpoint が属するサブネットの NSG が意図した通りに機能しない
+
+### 4. Private Endpoint が属するサブネットの UDR が意図した通りに機能しない
