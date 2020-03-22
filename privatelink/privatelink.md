@@ -64,13 +64,13 @@ Private Endpoint を使用する際に混乱しやすいポイントとして、
 
 例として、ストレージアカウント (FQDN : `mayonekastorageaccount.blob.core.windows.net`) について、プライベートエンドポイント無効化時と有効化時の名前解決の結果を比較してみます。
 
-#Private Endpoint 無効化時の名前解決結果
+<Private Endpoint 無効化時の名前解決結果>  
 <p><img src="./img/privateendpoint-disabled.png" alt="private-endpoint" /></p> 
 
 `mayonekastorageaccount.blob.core.windows.net ` の名前解決先として、
 `blob.ty1prdstr01a.store.core.windows.net` が応答されていることがわかります。
 
-#Private Endpoint 有効化時の名前解決結果
+<Private Endpoint 有効化時の名前解決結果>  
 <p><img src="./img/privateendpoint-enabled.png" alt="private-endpoint" /></p> 
 
 `mayonekastorageaccount.blob.core.windows.net ` の名前解決先として、
@@ -102,10 +102,12 @@ Private DNS ゾーンとリンクされた仮想ネットワーク内のリソ�
 
 この方法は、Private Endpoint 作成時に「プライベート DNS 統合」を有効化することでも可能となります。
 
+<プライベート DNS 統合の設定画面>  
 <p><img src="./img/privatezone-integration.png" alt="private-endpoint" title="プライベート DNS 統合の設定画面"/></p> 
 
 上記のストレージアカウントの場合、下記のようなPrivate DNS ゾーンが自動で作成されます。
 
+<自動で作成された Private DNS ゾーン>    
 <p><img src="./img/privatezone-example.png" alt="private-endpoint" title="自動で作成された Private DNS ゾーン"/></p> 
 
 ### 3. 独自の DNS サーバーを使用する
