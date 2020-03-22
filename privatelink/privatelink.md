@@ -31,7 +31,7 @@ Private Link (Private Endpoint 含む) と、Private Link サービスは、そ�
 従来、Azure パブリック サービス (PaaS サービス) はパブリック IP アドレスでのアクセスだけが可能でした。  
 これをお客様のネットワークに閉じたい場合、App Service でいう App Service Environment など、PaaS サービス自体を仮想ネットワーク上に構築するような機能が必要です。  
 しかし、ストレージアカウントなど、中にはそういった構成が出来ない PaaS サービスもあり、そういったサービスについてはプライベート IP 経由で通信することが出来ないため、PaaS サービス側のファイアウォールなどで最低限必要なパブリック IP アドレスを許可するような運用が必要でした。  
-また、サービスエンドポイントを使用する構成もありますが、サービスエンドポイントを使用しても宛先 IP アドレスはパブリック IP アドレスのままなので、オンプレミス側から VPN 経由や ExpressRoute (Private Peering) 経由で接続できないという問題もあります。
+また、サービスエンドポイントを使用する構成もありますが、サービスエンドポイントを使用しても宛先 IP アドレスはパブリック IP アドレスのままなので、オンプレミス側から VPN 経由や ExpressRoute (Private Peering) 経由で接続できないという問題もありました。
 
 そこで登場したのがプライベートエンドポイントです。
 
@@ -40,19 +40,27 @@ Private Link (Private Endpoint 含む) と、Private Link サービスは、そ�
 プライベートエンドポイントに対して、対象のサブネットからプライベート IP アドレスが払い出されるため、
 ユーザーはそのプライベート IP アドレスに通信することで、対象の PaaS サービスに通信することが可能となります。  
 勿論、VPN や ExpressRoute のプライベートピアリング経由でも通信することが可能になります。  
-加えて、対象の PaaS サービスのファイアウォール設定で、特定のパブリック IP アドレスを許可する必要がなくなります。
+
 
 <p><img src="./img/private-endpoint.png" alt="private-endpoint" /></p> 
 
+プライベートエンドポイントにより、パブリック エンドポイント (パブリック IP アドレス) を経由して Azure PaaS サービスにアクセスさせる必要がなくなり、より柔軟なネットワーク構成が可能になりました。
+
 ## Private Endpoint の作成方法
+
+具体的な作成方法については下記ドキュメントに纏められております。
+
+(ご参考)  
+クイック スタート:Azure portal を使用してプライベート エンドポイントを作成する  
+https://docs.microsoft.com/ja-jp/azure/private-link/create-private-endpoint-portal
+
 
 ## DNS 構成について
 Private Endpoint を使用する際に混乱しやすいポイントとして、**DNSの設定方法** があります。  
 まず知っておいていただきたい点として、Private Endpoint は**プライベート IP アドレスを提供するサービスであり、Azure PaaS サービスのFQDN をプライベート IP に名前解決してくれる機能は持ちません。**  
 つまり、Private Endpoint 以外の何かしらの方法で、対象の FQDN をプライベート IP アドレスに変換させる必要があります。
 
-この DNS の設定に際して、Private Endpoint 有効化時に Azure 側で追加される privatelink ゾーンが重要になります。  
-それは、Private Endpoint を有効化すると、元々の FQDN の名前解決先として、**privatelink.xxx** の CNAME が応答されるようになることです。
+この DNS の設定に際して、Private Endpoint 有効化時に Azure 側で追加される private link 用の DNS ゾーン (`privatelink.xxx.net`) が重要になります。  
 
 例として、ストレージアカウント (FQDN : `mayonekastorageaccount.blob.core.windows.net`) について、プライベートエンドポイント無効化時と有効化時の名前解決の結果を比較してみます。
 
@@ -70,21 +78,14 @@ Private Endpoint を使用する際に混乱しやすいポイントとして、
 この `privatelink.xxx` のゾーンが追加されることで、ユーザーは DNS サーバーにこのゾーンを追加し、対象のホスト名に対応するレコードを追加するだけで、
 Private Endpoint に名前解決させることが可能となります。
 
+以上を踏まえて、プライベートエンドポイントの DNS 設定として弊社が推奨している下記 3 つの方法について説明をしていきます。
 
-具体的には、下記 3 つの方法があります。
-
-1. Hosts ファイルを使用する (運用環境では非推奨)
-2. Private DNS ゾーンを使用する (Azure 仮想ネットワーク上のリソースに対してのみ有効)
-3. 独自の DNS ゾーンを使用する
-
-下記にて、それぞれ説明をしていきます。
-
-### Hosts ファイルを使用する (運用環境では非推奨)
+### 1. Hosts ファイルを使用する (運用環境では非推奨)
 この方法は、Azure PaaS サービスに使用される FQDN をプライベート IP アドレスに名前解決するよう、
 アクセス元の端末の Hosts ファイルに追記する方法です。  
 ドキュメントにも記載がありますが、この方法はテスト環境でのみ推奨されております。
 
-### Private DNS ゾーンを使用する (Azure 仮想ネットワーク上のリソースに対してのみ有効)
+### 2. Private DNS ゾーンを使用する (Azure 仮想ネットワーク上のリソースに対してのみ有効)
 Private DNS ゾーンとは、Azure 内部で提供される DNS サーバー (168.63.129.26) をご利用時に、
 Private DNS ゾーンとリンクされた仮想ネットワーク内のリソースに独自のゾーンを参照させることが可能になるサービスです。  
 例えば、仮想ネットワーク A に対して `example.com` のゾーンを持つ Private DNS ゾーン リソースを作成すると、
@@ -101,3 +102,5 @@ Private DNS ゾーンとリンクされた仮想ネットワーク内のリソ�
 この方法は、Private Endpoint 作成時に「プライベート DNS 統合」を有効化することでも可能となります。
 
 <p><img src="./img/privatezone-integration.png" alt="private-endpoint" /></p> 
+
+### 3. 独自の DNS サーバーを使用する
