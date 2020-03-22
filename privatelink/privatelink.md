@@ -64,13 +64,13 @@ Private Endpoint を使用する際に混乱しやすいポイントとして、
 
 例として、ストレージアカウント (FQDN : `mayonekastorageaccount.blob.core.windows.net`) について、プライベートエンドポイント無効化時と有効化時の名前解決の結果を比較してみます。
 
-#Private endpoint 無効化時の名前解決結果
+#Private Endpoint 無効化時の名前解決結果
 <p><img src="./img/privateendpoint-disabled.png" alt="private-endpoint" /></p> 
 
 `mayonekastorageaccount.blob.core.windows.net ` の名前解決先として、
 `blob.ty1prdstr01a.store.core.windows.net` が応答されていることがわかります。
 
-#Private endpoint 有効化時の名前解決結果
+#Private Endpoint 有効化時の名前解決結果
 <p><img src="./img/privateendpoint-enabled.png" alt="private-endpoint" /></p> 
 
 `mayonekastorageaccount.blob.core.windows.net ` の名前解決先として、
@@ -102,14 +102,24 @@ Private DNS ゾーンとリンクされた仮想ネットワーク内のリソ�
 
 この方法は、Private Endpoint 作成時に「プライベート DNS 統合」を有効化することでも可能となります。
 
-<p><img src="./img/privatezone-integration.png" alt="private-endpoint" /></p> 
+<p><img src="./img/privatezone-integration.png" alt="private-endpoint" title="プライベート DNS 統合の設定画面"/></p> 
 
 上記のストレージアカウントの場合、下記のようなPrivate DNS ゾーンが自動で作成されます。
 
-<p><img src="./img/privatezone-example.png" alt="private-endpoint" /></p> 
+<p><img src="./img/privatezone-example.png" alt="private-endpoint" title="自動で作成された Private DNS ゾーン"/></p> 
 
 ### 3. 独自の DNS サーバーを使用する
+オンプレミス ネットワークと Azure 仮想ネットワークを VPN や ExpressRoute の Private Peering で接続している構成では、上記の Private DNS ゾーンが利用できません。
+この場合、オンプレミスネットワーク内のリソースが参照している DNS サーバーに、Private Link 用の DNS ゾーンを追加し、プライベートエンドポイントを応答するレコードを追加する方法があります。
+ここで気を付ける必要があるポイントとして、Private Link 用のゾーン (`privatelink.blob.core.windows.net` など) ではなく、**元々のゾーン (`blob.core.windows.net` など) を追加することは推奨しておりません**。  
+もしも元々のゾーンを追加した場合、プライベートエンドポイントを有効化していない PaaS サービスについても、独自に追加したゾーンを参照することになります。  
+DNS サーバー側の設定にもよりますが、プライベートエンドポイントを有効化していない PaaS サービスにアクセスした際に正しく名前解決されなくなる影響もございますので、特別なご要件がない限りは、Private Link 用のゾーンをご利用いただくことをお勧めします。
 
+(ご参考)  
+DNS の構成  
+https://docs.microsoft.com/ja-jp/azure/private-link/private-endpoint-overview#dns-configuration  
+(抜粋)   
+>パブリック エンドポイントを解決する目的でアクティブに使用されているゾーンをオーバーライドすることはお勧めしません。 リソースへの接続は、パブリック DNS への DNS 転送なしでは正しく解決できません。 
 
 ## Private Link サービスとは
 
