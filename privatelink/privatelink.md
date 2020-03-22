@@ -10,7 +10,7 @@
 Private Link のドキュメントを読んでいただくと、プライベートエンドポイントだったり、プライベートリンクサービスだったり、
 似たような言葉が多く並んでいるかと思います。
 
-結論から言うと、**プライベートリンクは、プライベートエンドポイントとプライベートリンクサービスの総称**となります。
+結論から言うと、**プライベートリンクはプライベートエンドポイントとプライベートリンクサービスの総称**となります。
 
 * Private Endpoint
 
@@ -44,3 +44,60 @@ Private Link (Private Endpoint 含む) と、Private Link サービスは、そ�
 
 <p><img src="./img/private-endpoint.png" alt="private-endpoint" /></p> 
 
+## Private Endpoint の作成方法
+
+## DNS 構成について
+Private Endpoint を使用する際に混乱しやすいポイントとして、**DNSの設定方法** があります。  
+まず知っておいていただきたい点として、Private Endpoint は**プライベート IP アドレスを提供するサービスであり、Azure PaaS サービスのFQDN をプライベート IP に名前解決してくれる機能は持ちません。**  
+つまり、Private Endpoint 以外の何かしらの方法で、対象の FQDN をプライベート IP アドレスに変換させる必要があります。
+
+この DNS の設定に際して、Private Endpoint 有効化時に Azure 側で追加される privatelink ゾーンが重要になります。  
+それは、Private Endpoint を有効化すると、元々の FQDN の名前解決先として、**privatelink.xxx** の CNAME が応答されるようになることです。
+
+例として、ストレージアカウント (FQDN : `mayonekastorageaccount.blob.core.windows.net`) について、プライベートエンドポイント無効化時と有効化時の名前解決の結果を比較してみます。
+
+#Private endpoint 無効化時の名前解決結果
+<p><img src="./img/privateendpoint-disabled.png" alt="private-endpoint" /></p> 
+
+`mayonekastorageaccount.blob.core.windows.net ` の名前解決先として、
+`blob.ty1prdstr01a.store.core.windows.net` が応答されていることがわかります。
+
+#Private endpoint 有効化時の名前解決結果
+<p><img src="./img/privateendpoint-enabled.png" alt="private-endpoint" /></p> 
+
+`mayonekastorageaccount.blob.core.windows.net ` の名前解決先として、
+`privatelink.blob.core.windows.net` が応答されています。  
+この `privatelink.xxx` のゾーンが追加されることで、ユーザーは DNS サーバーにこのゾーンを追加し、対象のホスト名に対応するレコードを追加するだけで、
+Private Endpoint に名前解決させることが可能となります。
+
+
+具体的には、下記 3 つの方法があります。
+
+1. Hosts ファイルを使用する (運用環境では非推奨)
+2. Private DNS ゾーンを使用する (Azure 仮想ネットワーク上のリソースに対してのみ有効)
+3. 独自の DNS ゾーンを使用する
+
+下記にて、それぞれ説明をしていきます。
+
+### Hosts ファイルを使用する (運用環境では非推奨)
+この方法は、Azure PaaS サービスに使用される FQDN をプライベート IP アドレスに名前解決するよう、
+アクセス元の端末の Hosts ファイルに追記する方法です。  
+ドキュメントにも記載がありますが、この方法はテスト環境でのみ推奨されております。
+
+### Private DNS ゾーンを使用する (Azure 仮想ネットワーク上のリソースに対してのみ有効)
+Private DNS ゾーンとは、Azure 内部で提供される DNS サーバー (168.63.129.26) をご利用時に、
+Private DNS ゾーンとリンクされた仮想ネットワーク内のリソースに独自のゾーンを参照させることが可能になるサービスです。  
+例えば、仮想ネットワーク A に対して `example.com` のゾーンを持つ Private DNS ゾーン リソースを作成すると、
+仮想ネットワーク A 内のリソースが DNS サーバー (168.63.129.26) に名前解決する際に、
+`example.com` の Private DNS ゾーンを参照させることが可能になります。
+
+ご留意点として、DNS サーバー (168.63.129.26) のご利用が必須になるため、**カスタム DNS を使用している場合と、オンプレミス側から名前解決する場合には、ご利用いただけません**  
+※ DNS サーバー (168.63.129.26) は Azure からのアクセスのみ許可されている IP アドレスになります。
+
+この機能を利用して、Private Endpoint 有効化時に利用可能なゾーン (`privatelink.xxx`) に対応する Private DNS ゾーンを作成し、
+そのゾーン内に、Private Endpoint (プライベート IP アドレス) に対応する A レコードを追加することで、
+簡単にプライベートエンドポイント用の DNS 設定を構成することが可能です。
+
+この方法は、Private Endpoint 作成時に「プライベート DNS 統合」を有効化することでも可能となります。
+
+<p><img src="./img/privatezone-integration.png" alt="private-endpoint" /></p> 
