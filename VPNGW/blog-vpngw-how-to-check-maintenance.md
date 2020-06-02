@@ -1,6 +1,6 @@
 ---
-title: Application Gateway の証明書関連のトラブルシューティング
-date: 2020-05-11 12:30:00
+title: Azure VPN ゲートウェイにメンテナンスがあったかどうか確認する方法
+date: 2020-06-02 17:00
 tags:
   - Network
   - S2S VPN
