@@ -15,7 +15,7 @@ tags:
 今回は VPN ゲートウェイの S2S VPN 接続をご利用のお客様向けに、
 VPN 接続断がメンテナンス起因で発生したのかどうかを確認する方法をご紹介いたします。
 
-
+---
 IPsec VPN はその性質上、非常に多岐にわたる要因により通信断を引き起こします。  
 その要因の一つとして、Azure 基盤側のメンテナンスがあります。
 
@@ -48,13 +48,13 @@ Azure はクラウドサービスであるために、非常に多岐にわた�
 上記診断ログのうち、**GatewayDiagnosticLog** に、メンテナンスの情報が記録されます。  
 具体的には、メンテナンスがあった場合、"Message" フィールドに"Upgrade gateway started" が表示されます。
 
-### 出力例 :  
+#### 出力例 :  
 ![図1](blog-vpngw-how-to-check-maintenance02.png)
 
 ## TunnelDiagnosticLog と同時に表示させると切断時間も確認出来ます   
 下記のように、TunnelDiagnosticLog と並べて表示させることで、メンテナンスによる切断・再接続のタイミングも確認することが可能です。
 
-### 出力例 :   
+#### 出力例 :   
 ![図2](blog-vpngw-how-to-check-maintenance01.png)
 
 ## ■ 診断ログの設定方法
