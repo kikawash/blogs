@@ -27,7 +27,7 @@ IPsec VPN はその性質上、非常に多岐にわたる要因により通信�
 **メンテナンスの日時を事前に把握する方法ではなく、あくまでも事後に確認する方法になりますのでご留意ください。**
 
 
-## ■ メンテナンスの有無は、診断ログの GatewayDiagnosticLog より確認が出来ます
+## ■ 診断ログの GatewayDiagnosticLog にメンテナンス情報が記録される
 
 現在、Azure VPN Gateway の診断ログには、下記の診断ログがございます。
 
@@ -52,7 +52,7 @@ IPsec VPN はその性質上、非常に多岐にわたる要因により通信�
 #### 出力例 :  
 ![図1](blog-vpngw-how-to-check-maintenance02.png)
 
-## TunnelDiagnosticLog と同時に表示させると切断時間も確認出来ます   
+## TunnelDiagnosticLog と同時に表示させると切断時間も確認出来る   
 下記のように、TunnelDiagnosticLog と並べて表示させることで、メンテナンスによる切断・再接続のタイミングも確認することが可能です。
 
 #### 出力例 :   
