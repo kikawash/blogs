@@ -71,7 +71,8 @@ Azure VPNGW はインターネットを使用した VPN 接続であるため、
 * VPNGW SKU 性能  
 https://docs.microsoft.com/ja-jp/azure/vpn-gateway/vpn-gateway-about-vpngateways#gateway-skus-by-tunnel-connection-and-throughput  
   
-VPNGW 接続で想定性能がでない場合、 VPNGW リソース、弊社バックボーン状態を確認し、弊社設備内でパフォーマンスに影響する問題の有無について確認をいたします。弊社設備内に問題がなく、インターネット接続品質問題の可能性がある場合にはお客様へプロバイダ調査を依頼をすることがございます。  
+VPNGW 接続で想定性能がでない場合、 VPNGW リソース、弊社バックボーン状態を確認し、弊社設備内でパフォーマンスに影響する問題の有無について確認をいたします。  
+弊社設備内に問題がなく、インターネット接続品質問題の可能性がある場合にはお客様へプロバイダ調査を依頼をすることがございます。  
  
 # 4. VPNGW の仕様動作に関するご支援
 仕様動作に関する調査は、Professional Direct、もしくは Premier サポートの アドバイザリ サポートとして承ります。  
